@@ -1,49 +1,61 @@
-function asignarEventos(){
+console.log("JS cargado correctamente");
 
 document.getElementById("btnPath").addEventListener("click", sumaPath);
 document.getElementById("btnQuery").addEventListener("click", sumaQuery);
 document.getElementById("btnBody").addEventListener("click", sumaBody);
 
-}
-//Parametro PATH
+
+// PATH PARAM
 function sumaPath(){
 
 let a = document.getElementById("num1").value;
 let b = document.getElementById("num2").value;
 
-fetch(`http://localhost:3005/suma/${a}/${b}`)
-.then(response => response.json())
-.then(data=>{
+console.log("Click PATH");
+
+fetch(`https://calculadora-microservicios.onrender.com/suma/${a}/${b}`)
+.then(res => res.json())
+.then(data => {
 
 document.getElementById("resultado").innerText =
 "Resultado: " + data.resultado;
 
-});
+})
+.catch(error => console.error(error));
 
 }
-//Parametro QUERY
+
+
+// QUERY PARAM
 function sumaQuery(){
 
 let a = document.getElementById("num1").value;
 let b = document.getElementById("num2").value;
 
-fetch(`http://localhost:3005/sumaQuery?a=${a}&b=${b}`)
-.then(response => response.json())
-.then(data=>{
+console.log("Click QUERY");
+
+fetch(`https://calculadora-microservicios.onrender.com/sumaQuery?a=${a}&b=${b}`)
+.then(res => res.json())
+.then(data => {
 
 document.getElementById("resultado").innerText =
-"Resultado: "+data.resultado;
+"Resultado: " + data.resultado;
 
-});
+})
+.catch(error => console.error(error));
 
 }
-//Parametro BODY
+
+
+// BODY PARAM
 function sumaBody(){
 
 let a = document.getElementById("num1").value;
 let b = document.getElementById("num2").value;
 
-fetch("http://localhost:3005/sumaBody",{
+console.log("Click BODY");
+
+fetch("https://calculadora-microservicios.onrender.com/sumaBody",{
 
 method:"POST",
 
@@ -57,12 +69,13 @@ b: Number(b)
 })
 
 })
-.then(response => response.json())
-.then(data=>{
+.then(res => res.json())
+.then(data => {
 
 document.getElementById("resultado").innerText =
-"Resultado: "+data.resultado;
+"Resultado: " + data.resultado;
 
-});
+})
+.catch(error => console.error(error));
 
 }

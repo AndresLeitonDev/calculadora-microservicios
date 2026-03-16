@@ -1,9 +1,13 @@
 {
-  "name": "calculadora-microservicio",
+  "name": "calculadora",
   "version": "1.0.0",
+  "description": "Microservicio de suma desplegado en Render",
   "type": "module",
   "main": "server.mjs",
   "scripts": {
     "start": "node server.mjs"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
