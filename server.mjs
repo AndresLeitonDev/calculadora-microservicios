@@ -32,6 +32,19 @@ const server = createServer ((req, res) =>{
 
     const pathname = url.pathname;//indica la ruta especifica o la ubicacion del recurso dentro del servidor 
 
+//RUTA RAIZ
+if (pathname === "/") {
+    res.writeHead(200, headers);
+    res.end(JSON.stringify({
+        mensaje: "Microservicio calculadora funcionando",
+        endpoints: [
+            "/suma/:a/:b",
+            "/sumaQuery?a=&b=",
+            "/sumaBody (POST)"
+        ]
+    }));
+}
+
     //Parametros PATH
     if (pathname.startsWith('/suma/')) {// verifica si la ruta de la peticion comienza con /suma/
 
