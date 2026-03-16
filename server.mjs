@@ -82,5 +82,3 @@ const PORT = process.env.PORT || 3006;
 server.listen(PORT, () => {
     console.log("Servidor corriendo en puerto", PORT);
 });
-
-});
