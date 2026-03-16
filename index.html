@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Parametros en Microservicios</title>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+    }
+
+    h2 {
+        color: #2b9ac6;
+    }
+
+    input[type="number"] {
+        padding: 10px;
+        margin: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    button {
+        padding: 10px 20px;
+        margin: 5px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+</style>
+<body onload="asignarEventos()">
+
+<h2>Suma con diferentes parámetros</h2>
+
+Numero 1
+<input type="number" id="num1">
+
+<br><br>
+
+Numero 2
+<input type="number" id="num2">
+
+<br><br>
+
+<button id="btnPath">Suma PATH PARAMS</button>
+<button id="btnQuery">Suma QUERY PARAMS</button>
+<button id="btnBody">Suma BODY PARAMS</button>
+
+<h3 id="resultado">Resultado:</h3>
+
+<script src="funcionalidad.js"></script>
+
+</body>
+</html>
