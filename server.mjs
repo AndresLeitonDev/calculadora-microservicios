@@ -46,7 +46,7 @@ if (pathname === "/") {
 }
 
     //Parametros PATH
-    if (pathname.startsWith('/suma/')) {// verifica si la ruta de la peticion comienza con /suma/
+    else if (pathname.startsWith('/suma/')) {// verifica si la ruta de la peticion comienza con /suma/
 
         let a = Number(pathname.split('/')[2]);//divide la url en / y obtiene el valor de la posicion del arreglo
         let b = Number(pathname.split('/')[3]);//divide la url en / y obtiene el valor de la posicion del arreglo
