@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="es">
 
 <head>
@@ -7,138 +6,92 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora Microservicios</title>
 
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-    .container {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        padding: 40px;
-        max-width: 500px;
-        width: 100%;
-    }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
 
-    h2 {
-        color: #667eea;
-        text-align: center;
-        margin-bottom: 30px;
-    }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-    .input-group {
-        margin-bottom: 20px;
-    }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
 
-    label {
-        font-weight: 600;
-        display: block;
-        margin-bottom: 5px;
-    }
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border: none;
+            border-radius: 8px;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+        }
 
-    input, select {
-        width: 100%;
-        padding: 12px;
-        border-radius: 10px;
-        border: 2px solid #ddd;
-    }
+        button:hover {
+            opacity: 0.9;
+        }
 
-    input:focus {
-        border-color: #667eea;
-        outline: none;
-    }
+        #loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
 
-    .button-group {
-        display: grid;
-        gap: 10px;
-        margin-top: 20px;
-    }
+        #resultado {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
 
-    button {
-        padding: 15px;
-        border: none;
-        border-radius: 10px;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        color: white;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    button:hover {
-        transform: translateY(-2px);
-    }
-
-    button:disabled {
-        background: gray;
-        cursor: not-allowed;
-    }
-
-    #loading {
-        display: none;
-        margin-top: 10px;
-        color: #667eea;
-        font-weight: bold;
-        text-align: center;
-    }
-
-    #resultado {
-        margin-top: 20px;
-        font-size: 1.3rem;
-        font-weight: bold;
-        text-align: center;
-    }
-</style>
-
-<script defer src="funcionalidad.js"></script>
-
-
+    <script defer src="funcionalidad.js"></script>
 </head>
 
 <body>
 
-
 <div class="container">
 
-    <h2>🧮 Calculadora de Microservicios</h2>
+    <h2>🧮 Calculadora Microservicios</h2>
 
-    <div class="input-group">
-        <label>Número 1</label>
-        <input type="number" id="num1">
-    </div>
+    <input type="number" id="num1" placeholder="Número 1">
+    <input type="number" id="num2" placeholder="Número 2">
 
-    <div class="input-group">
-        <label>Número 2</label>
-        <input type="number" id="num2">
-    </div>
+    <select id="tipo">
+        <option value="path">PATH</option>
+        <option value="query">QUERY</option>
+        <option value="body">BODY</option>
+    </select>
 
-    <div class="input-group">
-        <label>Tipo de envío</label>
-        <select id="tipo">
-            <option value="path">PATH</option>
-            <option value="query">QUERY</option>
-            <option value="body">BODY</option>
-        </select>
-    </div>
-
-    <div class="button-group">
-        <button onclick="calcular('suma')">➕ Sumar</button>
-        <button onclick="calcular('resta')">➖ Restar</button>
-        <button onclick="calcular('multiplicacion')">✖ Multiplicar</button>
-        <button onclick="calcular('division')">➗ Dividir</button>
-        <button onclick="limpiar()">🧹 Limpiar</button>
-    </div>
+    <button onclick="calcular('suma')">➕ Sumar</button>
+    <button onclick="calcular('resta')">➖ Restar</button>
+    <button onclick="calcular('multiplicacion')">✖ Multiplicar</button>
+    <button onclick="calcular('division')">➗ Dividir</button>
+    <button onclick="limpiar()">🧹 Limpiar</button>
 
     <p id="loading">⏳ Procesando...</p>
 
@@ -146,7 +99,5 @@
 
 </div>
 
-
 </body>
-
 </html>
