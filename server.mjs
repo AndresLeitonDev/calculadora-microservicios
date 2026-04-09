@@ -1,97 +1,231 @@
-//Se importa el modulo http para crear un servidor en Node.js.
-import {createServer} from 'node:http';
-// Se crea el servidor, cada vez que un cliente hace una peticion (req) y el servidor responde (res)
-//con el Arrow Fuction (=>) se define la logica de manejo de las peticiones y respuestas del servidor. 
-const server = createServer ((req, res) =>{
-//Se definen las cabeceras HTTP de la respuesta
-    const headers = {
-        'Content-Type': 'application/json',// omite los otros encabezados.
-        //content-type indica que el cuerpo de la respuesta es un JSON, lo que permite a los clientes
-        //interpretar correctamente los datos recibidos.
-        'Access-Control-Allow-Origin': '*', // permite a cualquier dominio consumir el microservicio
-    };
-    /*
-    Si el metodo de la peticion es OPTIONS, se responde con los encabezados necesarios para permitir el acceso
-    desde cualquier origen, y se termina la respuesta sin procesar mas logica.
-    El navegador antes de enviar una peticion POST, envia una peticion especial Llamada OPTIONS 
-    para verificar si el servidor permite la peticion POST desde el origen del cliente.
-    */
-    if (req.method === "OPTIONS") {
-    //Responde con estatus 200 ok y los encabezados necesarios para permitir el acceso desde cualquier origen.
+// Se importa el modulo http para crear un servidor en Node.js.
+import { createServer } from 'node:http';
+// Se crea el servidor, cada vez que un cliente hace una petición (req)
+// y el servidor responde (res)
+const server = createServer((req, res) => {
+// Cabeceras HTTP de la respuesta
+const headers = {
+'Content-Type': 'application/json', // indica que la respuesta será JSON
+'Access-Control-Allow-Origin': '*', // permite que cualquier dominio consuma la API
+};
+/*
+Manejo de CORS (preflight)
+El navegador antes de enviar una petición POST, envía una petición OPTIONS
+para verificar si el servidor permite la petición desde otro origen.
+*/  
+if (req.method === "OPTIONS") {
     res.writeHead(200, {
-        "Access-Control-Allow-Origin": "*",// cualquier dominio puede consumir el microservicio
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",// metodos permitidos para las peticiones
-        "Access-Control-Allow-Headers": "Content-Type" //permite enviar json en el body de la peticion
+        "Access-Control-Allow-Origin": "*", // permite cualquier origen
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS", // métodos permitidos
+        "Access-Control-Allow-Headers": "Content-Type" // permite enviar JSON en el body
     });
 
-    res.end(); // termina la respuesta
-    return;// evita que el servidor siga ejecutando codigo.
+    return res.end(); // termina la respuesta y evita que siga ejecutando código
 }
-    //se crea un objeto url para analizar la peticion
-    const url = new URL(req.url, `http://${req.headers.host}`);// variable que contiene la direccion del servidor
 
-    const pathname = url.pathname;//indica la ruta especifica o la ubicacion del recurso dentro del servidor 
+//Se crea un objeto URL para analizar la petición
+const url = new URL(req.url, `http://${req.headers.host}`);
 
-//RUTA RAIZ
+//Se obtiene la ruta (endpoint)
+const pathname = url.pathname;
+
+console.log("Endpoint recibido:", pathname);
+
+//Ignorar solicitud automática del navegador (favicon)
+if (pathname === "/favicon.ico") {
+    return res.end();
+}
+
+//RUTA RAÍZ
+//Muestra información del microservicio
 if (pathname === "/") {
     res.writeHead(200, headers);
-    res.end(JSON.stringify({
+    return res.end(JSON.stringify({
         mensaje: "Microservicio calculadora funcionando",
         endpoints: [
             "/suma/:a/:b",
+            "/resta/:a/:b",
+            "/multiplicacion/:a/:b",
+            "/division/:a/:b",
             "/sumaQuery?a=&b=",
             "/sumaBody (POST)"
         ]
     }));
 }
 
-    //Parametros PATH
-    else if (pathname.startsWith('/suma/')) {// verifica si la ruta de la peticion comienza con /suma/
+//PARÁMETROS PATH (TODAS LAS OPERACIONES)
+//Ejemplo: /suma/5/7
+else if (
+    pathname.startsWith('/suma/') ||
+    pathname.startsWith('/resta/') ||
+    pathname.startsWith('/multiplicacion/') ||
+    pathname.startsWith('/division/')
+) {
 
-        let a = Number(pathname.split('/')[2]);//divide la url en / y obtiene el valor de la posicion del arreglo
-        let b = Number(pathname.split('/')[3]);//divide la url en / y obtiene el valor de la posicion del arreglo
+    //Se divide la ruta en partes usando "/"
+    let partes = pathname.split('/');
 
-        let resultado = a + b;// se crea la variable resultado que almacena la suma de a y b
+    //Se identifica la operación (suma, resta, etc.)
+    let operacion = partes[1];
 
-        res.writeHead(200, headers); // responde con estatus 200 ok y los encabezados definidos anteriormente
-        res.end(JSON.stringify({resultado}));//conveirte la respuesta final en un JSON
+    //Se obtienen los valores y se convierten a número
+    let a = Number(partes[2]);
+    let b = Number(partes[3]);
+
+    let resultadoOperacion;
+
+    //Validación de datos
+    if (isNaN(a) || isNaN(b)) {
+        return res.end(JSON.stringify({ error: "Datos invalidos" }));
     }
-    // Parametros QUERY
-    else if (pathname === '/sumaQuery') {// verifica si la ruta de la peticion es estrictamente /sumaQuery
 
-        let a = Number(url.searchParams.get('a'));//searchParams es un objeto que se encarga de procesar la busqueda de parametros o filtros
-        let b = Number(url.searchParams.get('b'));//son los datos que parecen despues del ?, obtiene el valor del query param a yb
-
-        let resultado = a + b;// se crea la variable resultado que almacena la suma de a y b
-
-        res.writeHead(200, headers);// responde con estatus 200 ok y los encabezados definidos anteriormente
-        res.end(JSON.stringify({resultado}));//conveirte la respuesta final en un JSON
-    }
-    // Parametros BODY recibe datos dentro del cuerpo de la peticion
-        else if (pathname === '/sumaBody') {// verifica si la ruta de la peticion es estrictamente /sumaBody
-            console.log("Entro al endpoint BODY");// se muestra un mensaje en la consola indicando que se ha accedido al endpoint
-            let body = "";// se crea una variable vacia para almacenar el cuerpo de la peticion
-
-            req.on('data', chunk => {// chunk es un fragmento de datos que se recibe del cuerpo de la peticion
-                body += chunk.toString();// cada fragmento se convierte en String y lo concatena
-        });
-            req.on('end', () => {// fin de la recepcion de datos
-                console.log("Body recibido:", body);//imprime el body recibido en consola
-                if (body) {
-                    let datos = JSON.parse(body);//convierte el texto json en objeto de JavaScript y lo almacena en la variable datos
-
-                    let resultado = datos.a + datos.b;// se crea la variable resultado que almacena la suma de a y b
-
-                    res.writeHead(200, headers);// responde con estatus 200 ok y los encabezados definidos anteriormente
-                    res.end(JSON.stringify({resultado}));//envia la respuesta final en un JSON, convirtiendo el objeto en json
-                }
-
-            });
+    //Lógica de operaciones
+    if (operacion === 'suma') {
+        resultadoOperacion = a + b;
+    } else if (operacion === 'resta') {
+        resultadoOperacion = a - b;
+    } else if (operacion === 'multiplicacion') {
+        resultadoOperacion = a * b;
+    } else if (operacion === 'division') {
+        if (b === 0) {
+            return res.end(JSON.stringify({ error: "No se puede dividir por cero" }));
         }
+        resultadoOperacion = a / b;
+    }
+
+    //Respuesta al cliente
+    res.writeHead(200, headers);
+    return res.end(JSON.stringify({
+        operacion,
+        a,
+        b,
+        resultado: resultadoOperacion
+    }));
+}
+
+//PARÁMETROS QUERY (TODAS LAS OPERCIONES)
+//Ejemplo: /sumaQuery?a=5&b=7
+//sumaQuery?a=5&b=7
+//restaQuery?a=5&b=7
+//multiplicacionQuery?a=5&b=7
+//divisionQuery?a=5&b=7
+else if (
+    pathname === '/sumaQuery' ||
+    pathname === '/restaQuery' ||
+    pathname === '/multiplicacionQuery' ||
+    pathname === '/divisionQuery'
+) {
+
+    //Se obtiene la operacion desde el endpoint
+    let operacion = pathname.replace('Query', '').replace('/', '');
+
+    // Se obtienen los valores desde la URL
+    let a = Number(url.searchParams.get('a'));
+    let b = Number(url.searchParams.get('b'));
+
+    // Validación
+    if (isNaN(a) || isNaN(b)) {
+        return res.end(JSON.stringify({ error: "Datos invalidos" }));
+    }
+
+    let resultado;
+    
+    //Lógica de operaciones
+    if (operacion === 'suma') {
+        resultado = a + b;
+    } else if (operacion === 'resta') {
+        resultado = a - b;
+    } else if (operacion === 'multiplicacion') {
+        resultado = a * b;
+    } else if (operacion === 'division') {
+        if (b === 0) {
+            return res.end(JSON.stringify({ error: "No se puede dividir por cero" }));
+        }
+        resultado = a / b;
+    }
+    res.writeHead(200, headers);
+    return res.end(JSON.stringify({ operacion, a, b, resultado }));
+}
+
+//PARÁMETROS BODY (PARA TODAS LAS OPERACIONES)
+/*Ejemplo: POST /sumaBody con JSON en el body:
+/restaBody
+/multiplicacionBody
+/divisionBody*/
+
+else if (
+    pathname === '/sumaBody' ||
+    pathname === '/restaBody' ||
+    pathname === '/multiplicacionBody' ||
+    pathname === '/divisionBody'
+) {
+    console.log("Entro al endpoint BODY");
+
+    let body = "";
+
+    //Se reciben los datos en fragmentos (chunks)
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+
+    //Cuando termina de recibir los datos
+    req.on('end', () => {
+        try {
+            console.log("Body crudo:", body);
+            console.log("Body recibido:", body);
+
+            //Se convierte el JSON a objeto JS
+            let datos = JSON.parse(body);
+
+            let operacion = pathname.replace('Body', '').replace('/', '');
+
+            let a = Number(datos.a);
+            let b = Number(datos.b);
+
+            //Validación
+            if (isNaN(a) || isNaN(b)) {
+                return res.end(JSON.stringify({ error: "Datos invalidos" }));
+            }
+
+            let resultado;
+
+            //Lógica de operaciones
+            if (operacion === 'suma') {
+                resultado = a + b;
+            } else if (operacion === 'resta') {
+                resultado = a - b;
+            } else if (operacion === 'multiplicacion') {
+                resultado = a * b;
+            } else if (operacion === 'division') {
+                if (b === 0) {
+                    return res.end(JSON.stringify({ error: "No se puede dividir por cero" }));
+                }
+                resultado = a / b;
+            }
+
+            res.writeHead(200, headers);
+            return res.end(JSON.stringify({ operacion, a, b, resultado }));
+
+        } catch (error) {
+            //Error si el JSON está mal formado
+            return res.end(JSON.stringify({ error: "JSON invalido" }));
+        }
+    });
+
+    return; //importante para no continuar ejecutando código
+}
+
+//RUTA NO VÁLIDA
+
+res.writeHead(404, headers);
+return res.end(JSON.stringify({ error: "Ruta no válida" }));
+
 });
 
+//Puerto dinámico para Render
 const PORT = process.env.PORT || 3006;
 
+//Se inicia el servidor
 server.listen(PORT, () => {
-    console.log("Servidor corriendo en puerto", PORT);
+console.log("Servidor corriendo en puerto", PORT);
 });

@@ -1,240 +1,151 @@
 <!DOCTYPE html>
+
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parámetros en Microservicios</title>
+    <title>Calculadora Microservicios</title>
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 40px;
-            max-width: 500px;
-            width: 100%;
-            animation: fadeIn 0.6s ease;
-        }
+    .container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        padding: 40px;
+        max-width: 500px;
+        width: 100%;
+    }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    h2 {
+        color: #667eea;
+        text-align: center;
+        margin-bottom: 30px;
+    }
 
-        h2 {
-            color: #667eea;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
+    .input-group {
+        margin-bottom: 20px;
+    }
 
-        .input-group {
-            margin-bottom: 25px;
-        }
+    label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 5px;
+    }
 
-        label {
-            display: block;
-            color: #333;
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 0.95rem;
-        }
+    input, select {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: 2px solid #ddd;
+    }
 
-        input[type="number"] {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
-        }
+    input:focus {
+        border-color: #667eea;
+        outline: none;
+    }
 
-        input[type="number"]:focus {
-            outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-        }
+    .button-group {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+    }
 
-        .button-group {
-            display: grid;
-            gap: 12px;
-            margin: 30px 0;
-        }
+    button {
+        padding: 15px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+    }
 
-        button {
-            padding: 15px 25px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            position: relative;
-            overflow: hidden;
-        }
+    button:hover {
+        transform: translateY(-2px);
+    }
 
-        button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
+    button:disabled {
+        background: gray;
+        cursor: not-allowed;
+    }
 
-        button:hover::before {
-            width: 300px;
-            height: 300px;
-        }
+    #loading {
+        display: none;
+        margin-top: 10px;
+        color: #667eea;
+        font-weight: bold;
+        text-align: center;
+    }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-        }
+    #resultado {
+        margin-top: 20px;
+        font-size: 1.3rem;
+        font-weight: bold;
+        text-align: center;
+    }
+</style>
 
-        button:active {
-            transform: translateY(0);
-        }
+<script defer src="funcionalidad.js"></script>
 
-        #btnPath {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
-        }
-
-        #btnPath:hover {
-            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
-        }
-
-        #btnQuery {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
-        }
-
-        #btnQuery:hover {
-            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.6);
-        }
-
-        #btnBody {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            box-shadow: 0 4px 15px rgba(67, 233, 123, 0.4);
-        }
-
-        #btnBody:hover {
-            box-shadow: 0 6px 20px rgba(67, 233, 123, 0.6);
-        }
-
-        .resultado-container {
-            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-            border-radius: 15px;
-            padding: 25px;
-            text-align: center;
-            margin-top: 30px;
-            border: 2px solid #667eea30;
-        }
-
-        #resultado {
-            color: #333;
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 0;
-        }
-
-        .emoji {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        /* Responsive */
-        @media (max-width: 600px) {
-            .container {
-                padding: 25px;
-            }
-
-            h2 {
-                font-size: 1.5rem;
-            }
-
-            input[type="number"] {
-                padding: 12px;
-                font-size: 1rem;
-            }
-
-            button {
-                padding: 12px 20px;
-                font-size: 0.95rem;
-            }
-
-            #resultado {
-                font-size: 1.3rem;
-            }
-        }
-    </style>
-
-    <!-- defer hace que el script se ejecute cuando el HTML ya esté cargado -->
-    <script defer src="funcionalidad.js"></script>
 
 </head>
 
 <body>
 
-    <div class="container">
-        <h2>🔢 Suma con Diferentes Parámetros</h2>
 
-        <div class="input-group">
-            <label for="num1">📊 Número 1</label>
-            <input type="number" id="num1" placeholder="Ingresa el primer número">
-        </div>
+<div class="container">
 
-        <div class="input-group">
-            <label for="num2">📊 Número 2</label>
-            <input type="number" id="num2" placeholder="Ingresa el segundo número">
-        </div>
+    <h2>🧮 Calculadora de Microservicios</h2>
 
-        <div class="button-group">
-            <button id="btnPath">🛣️ Suma PATH PARAMS</button>
-            <button id="btnQuery">❓ Suma QUERY PARAMS</button>
-            <button id="btnBody">📦 Suma BODY PARAMS</button>
-        </div>
-
-        <div class="resultado-container">
-            <span class="emoji">🎯</span>
-            <h3 id="resultado">Resultado: --</h3>
-        </div>
+    <div class="input-group">
+        <label>Número 1</label>
+        <input type="number" id="num1">
     </div>
+
+    <div class="input-group">
+        <label>Número 2</label>
+        <input type="number" id="num2">
+    </div>
+
+    <div class="input-group">
+        <label>Tipo de envío</label>
+        <select id="tipo">
+            <option value="path">PATH</option>
+            <option value="query">QUERY</option>
+            <option value="body">BODY</option>
+        </select>
+    </div>
+
+    <div class="button-group">
+        <button onclick="calcular('suma')">➕ Sumar</button>
+        <button onclick="calcular('resta')">➖ Restar</button>
+        <button onclick="calcular('multiplicacion')">✖ Multiplicar</button>
+        <button onclick="calcular('division')">➗ Dividir</button>
+        <button onclick="limpiar()">🧹 Limpiar</button>
+    </div>
+
+    <p id="loading">⏳ Procesando...</p>
+
+    <h3 id="resultado">Resultado: --</h3>
+
+</div>
+
 
 </body>
 
